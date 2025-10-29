@@ -1,11 +1,61 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import ProyectoItem from '../components/ProyectoItem.astro';
+import '../styles/global.css';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const proyectos = [
+    {
+        titulo: "Linkveo",
+        descripcion: "Una aplicación web para gestionar y compartir enlaces de interés.",
+        tecnologias: "React, Node.js, MongoDB",
+        githubUrl: "https://github.com/[tu_usuario]/linkveo-frontend" 
+    },
+    {
+        titulo: "Proyecto Deprecado Ejemplo",
+        descripcion: "Un script de automatización que ya no está en producción, pero muestra mi código.",
+        tecnologias: "Python, Flask",
+        githubUrl: "https://github.com/[tu_usuario]/proyecto-antiguo" 
+    },
+];
 ---
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Sebastián Díaz Miranda</title>
+</head>
 
-<Layout>
-	<Welcome />
-</Layout>
+<body class="bg-slate-800 text-slate-200 font-sans">
+    
+    <main class="container mx-auto max-w-3xl p-8">
+        
+        <section>
+            <h1 class="text-4xl font-bold text-purple-400 mb-4">Hola, soy Sebastián Díaz</h1>
+            <p class="text-lg text-slate-300">
+                Soy Desarrollador Front-End... apasionado por crear experiencias web atractivas y funcionales.
+            </p>
+        </section>
+
+        <section class="mt-12">
+            <h2 class="text-3xl font-bold text-purple-400 mb-6">Proyectos</h2>
+            
+            {proyectos.map(proyecto => (
+                <ProyectoItem
+                    titulo={proyecto.titulo}
+                    descripcion={proyecto.descripcion}
+                    tecnologias={proyecto.tecnologias}
+                    githubUrl={proyecto.githubUrl}
+                />
+            ))}
+        </section>
+
+        <section class="mt-12">
+            <h2 class="text-3xl font-bold text-purple-400 mb-4">Contacto</h2>
+            <p class="text-lg">
+                Puedes encontrarme en 
+                <a href="https://www.linkedin.com/in/sebastián-díaz-miranda" target="_blank" class="font-medium text-purple-300 hover:underline">LinkedIn</a> o
+                ver más en mi <a href="https://github.com/Sebastianidm/" target="_blank" class="font-medium text-purple-300 hover:underline">GitHub</a>.
+            </p>
+        </section>
+    </main>
+</body>
+</html>
