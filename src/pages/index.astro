@@ -1,5 +1,7 @@
 ---
 import ProyectoItem from '../components/ProyectoItem.astro';
+import SkillBadge from '../components/SkillBadge.astro';
+import StratagemModal from '../components/StratagemModal.astro'; // <-- ¡IMPORTA EL NUEVO MODAL!
 import '../styles/global.css';
 
 const proyectos = [
@@ -7,53 +9,100 @@ const proyectos = [
         titulo: "Linkveo",
         descripcion: "Una aplicación web para gestionar y compartir enlaces de interés.",
         tecnologias: "React, Node.js, MongoDB",
-        githubUrl: "https://github.com/[tu_usuario]/linkveo-frontend" 
+        githubUrl: "https://github.com/Sebastianidm/linkveo-frontend",
+        // ¡NUEVO! La secuencia de flechas para este proyecto
+        stratagem: [
+            'ArrowUp',
+            'ArrowRight',
+            'ArrowDown',
+            'ArrowDown',
+            'ArrowUp'
+        ]
     },
     {
         titulo: "Proyecto Deprecado Ejemplo",
-        descripcion: "Un script de automatización que ya no está en producción, pero muestra mi código.",
+        descripcion: "Un script de automatización que ya no está en producción.",
         tecnologias: "Python, Flask",
-        githubUrl: "https://github.com/[tu_usuario]/proyecto-antiguo" 
+        githubUrl: "https://github.com/Sebastianidm/proyecto-antiguo-ejemplo",
+        // ¡NUEVO! Una secuencia diferente
+        stratagem: [
+            'ArrowDown',
+            'ArrowDown',
+            'ArrowUp',
+            'ArrowRight'
+        ]
     },
+    // ... Agrega más proyectos aquí con sus propios 'stratagem'
 ];
+
 ---
+
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Sebastián Díaz Miranda</title>
+    <title>Sebastián Díaz // Portafolio Cyberpunk</title>
 </head>
 
-<body class="bg-slate-800 text-slate-200 font-sans">
-    
+<body class="text-slate-300 font-mono">    
     <main class="container mx-auto max-w-3xl p-8">
-        
-        <section>
-            <h1 class="text-4xl font-bold text-purple-400 mb-4">Hola, soy Sebastián Díaz</h1>
-            <p class="text-lg text-slate-300">
-                Soy Desarrollador Front-End... apasionado por crear experiencias web atractivas y funcionales.
+       <StratagemModal />
+       <section>
+            <h1 class="text-5xl font-bold text-fuchsia-500 mb-4 hover:animate-glitch">
+              Hola, soy Sebastián Díaz
+            </h1>
+
+            <p class="text-lg text-slate-400">
+                Desarrollador Front-End apasionado por crear experiencias web atractivas y funcionales con una estética cyberpunk.
             </p>
         </section>
 
-        <section class="mt-12">
-            <h2 class="text-3xl font-bold text-purple-400 mb-6">Proyectos</h2>
-            
-            {proyectos.map(proyecto => (
-                <ProyectoItem
-                    titulo={proyecto.titulo}
-                    descripcion={proyecto.descripcion}
-                    tecnologias={proyecto.tecnologias}
-                    githubUrl={proyecto.githubUrl}
-                />
-            ))}
+        <section class="mt-16">
+<section class="mt-16">
+    <h2 class="text-4xl font-bold text-lime-400 mb-8 animate-pulse-green">Proyectos</h2>
+    
+    {proyectos.map(proyecto => (
+        <ProyectoItem {...proyecto} />
+    ))}
+</section>
+
+        <section class="mt-16">
+<h2 class="text-4xl font-bold text-lime-400 mb-8 animate-pulse-green">Habilidades</h2>            
+            <div>
+                <h3 class="text-xl font-semibold text-fuchsia-400 mb-4">Front-End</h3>
+                <div class="flex flex-wrap">
+                    <SkillBadge>React</SkillBadge>
+                    <SkillBadge>Astro</SkillBadge>
+                    <SkillBadge>JavaScript</SkillBadge>
+                    <SkillBadge>TypeScript</SkillBadge>
+                    <SkillBadge>Tailwind CSS</SkillBadge>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h3 class="text-xl font-semibold text-fuchsia-400 mb-4">Back-End & Datos</h3>
+                <div class="flex flex-wrap">
+                    <SkillBadge>Python</SkillBadge>
+                    <SkillBadge>Java</SkillBadge>
+                    <SkillBadge>Azure</SkillBadge>
+                </div>
+            </div>
+             
+             <div class="mt-6">
+                <h3 class="text-xl font-semibold text-fuchsia-400 mb-4">Cloud & DevOps</h3>
+                <div class="flex flex-wrap">
+                    <SkillBadge>AWS</SkillBadge>
+                    <SkillBadge>Git</SkillBadge>
+                </div>
+            </div>
+
         </section>
 
-        <section class="mt-12">
-            <h2 class="text-3xl font-bold text-purple-400 mb-4">Contacto</h2>
-            <p class="text-lg">
+        <section class="mt-16">
+<h2 class="text-4xl font-bold text-lime-400 mb-8 animate-pulse-green">Contacto</h2>            <p class="text-lg">
                 Puedes encontrarme en 
-                <a href="https://www.linkedin.com/in/sebastián-díaz-miranda" target="_blank" class="font-medium text-purple-300 hover:underline">LinkedIn</a> o
-                ver más en mi <a href="https://github.com/Sebastianidm/" target="_blank" class="font-medium text-purple-300 hover:underline">GitHub</a>.
+                <a href="https://www.linkedin.com/in/sebastián-díaz-miranda" target="_blank" class="font-medium text-lime-400 hover:text-lime-300 hover:underline">LinkedIn</a> o
+                ver más en mi <a href="https://github.com/Sebastianidm/" target="_blank" class="font-medium text-lime-400 hover:text-lime-300 hover:underline">GitHub</a>.
             </p>
         </section>
     </main>

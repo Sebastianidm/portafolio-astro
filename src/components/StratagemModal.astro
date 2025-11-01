@@ -1,0 +1,264 @@
+---
+// Por ahora no necesitamos props de Astro, el componente se manejará solo
+// con JavaScript del lado del cliente.
+---
+
+<div id="stratagem-modal" class="fixed inset-0 z-50 hidden bg-black/80 p-4">    <div id="modal-content" class="relative w-full max-w-md rounded-lg border-2 border-fuchsia-500 bg-gray-950 shadow-[0_0_25px_rgba(192,38,211,0.9)] p-6">
+        
+        <button id="modal-close-btn" class="absolute -top-3 -right-3 rounded-full bg-lime-400 p-1 text-black transition-transform hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <h2 id="modal-title" class="mb-4 text-center text-2xl font-bold text-lime-400 animate-pulse-green">
+            ¡SOLICITUD DE ACCESO!
+        </h2>
+        
+        <p class="mb-2 text-center text-slate-400">Ingrese el código de acceso:</p>
+        <div id="modal-sequence-display" class="mb-6 flex h-16 items-center justify-center gap-3 rounded bg-gray-900 p-4">
+            </div>
+
+        <div id="modal-feedback" class="mb-4 h-6 text-center text-xl font-bold">
+            </div>
+
+        <div class="grid grid-cols-3 items-center justify-items-center gap-2">
+            <div></div> <button data-key="ArrowUp" class="stratagem-btn">↑</button>
+            <div></div> <button data-key="ArrowLeft" class="stratagem-btn">←</button>
+            <button data-key="ArrowDown" class="stratagem-btn">↓</button>
+            <button data-key="ArrowRight" class="stratagem-btn">→</button>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a id="modal-skip-link" href="#" target="_blank" class="text-sm text-slate-500 hover:text-lime-400 hover:underline">
+                [ Omitir y ver el Repositorio ]
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stratagem-btn {
+        @apply h-16 w-16 rounded-md border-2 border-lime-500 bg-gray-900 text-3xl font-bold text-lime-500 transition-all;
+        /* Al presionar (activo) */
+    }
+    .stratagem-btn:active {
+        @apply scale-90 bg-lime-500 text-black;
+    }
+</style>
+
+<script>
+    // Seleccionamos todos los elementos que necesitamos una sola vez
+    const modal = document.getElementById('stratagem-modal')!;
+    const modalContent = document.getElementById('modal-content')!;
+    const closeBtn = document.getElementById('modal-close-btn')!;
+    const skipLink = document.getElementById('modal-skip-link')!;
+    const title = document.getElementById('modal-title')!;
+    const sequenceDisplay = document.getElementById('modal-sequence-display')!;
+    const feedback = document.getElementById('modal-feedback')!;
+    
+    // Botones táctiles
+    const touchButtons = document.querySelectorAll('.stratagem-btn');
+
+    // Estado del juego
+    let targetSequence: string[] = []; // La secuencia correcta (ej: ['ArrowDown', 'ArrowUp'])
+    let userSequence: string[] = [];   // La secuencia del usuario
+    let targetUrl: string = '#';       // El link de GitHub
+
+    // -------------
+    // 1. Lógica de Mostrar / Ocultar
+    // -------------
+
+    // Función para CERRAR el modal
+    function hideModal() {
+        modal.classList.add('hidden');
+        // Quita las clases de centrado
+        modal.classList.remove('flex', 'items-center', 'justify-center'); 
+        resetGame(); // Resetea el juego
+    }
+
+    // Función para MOSTRAR el modal (la llamaremos desde ProyectoItem)
+  function showModal(data: { url: string; sequence: string[]; title: string }) {
+        
+        /* ================================== */
+        /* ¡ESTE ES EL CÓDIGO QUE FALTABA! */
+        /* ================================== */
+        
+        // 1. Guarda los datos recibidos en las variables globales
+        targetUrl = data.url;
+        targetSequence = data.sequence; 
+        
+        // 2. Actualiza la UI del modal con los datos
+        skipLink.setAttribute('href', targetUrl);
+        title.textContent = `ACCESO A: ${data.title.toUpperCase()}`;
+        /* ================================== */
+
+
+        // 3. Ahora sí, dibuja las flechas (esta línea ya la tenías)
+        drawSequenceDisplay(); // Ahora 'targetSequence' SÍ tiene datos
+        
+        // 4. Muestra el modal (esto ya lo tenías)
+        modal.classList.remove('hidden');
+        modal.classList.add('flex', 'items-center', 'justify-center');
+    }
+
+    // Exponemos la función 'showModal' al objeto 'window' para
+    // que otros scripts (de ProyectoItem) puedan llamarla.
+    (window as any).showStratagemModal = showModal;
+
+    // Event Listeners para cerrar
+    closeBtn.addEventListener('click', hideModal);
+    modal.addEventListener('click', (e) => {
+        // Si se hace clic en el fondo oscuro (el overlay), pero NO en el contenido
+        if (e.target === modal) {
+            hideModal();
+        }
+    });
+
+    // -------------
+    // 2. Lógica del Juego
+    // -------------
+
+    // Función para manejar una entrada (de teclado o táctil)
+    function handleInput(key: string) {
+        // Solo nos importan las flechas
+        if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+            return;
+        }
+
+        userSequence.push(key);
+
+        // Comprobar si el usuario ya cometió un error
+       const currentSlice = targetSequence.slice(0, userSequence.length);
+        if (JSON.stringify(currentSlice) !== JSON.stringify(userSequence)) {
+            // ¡Error!
+            showFeedback('¡ERROR DE CÓDIGO!', 'error');
+            resetGame(false); // Resetea sin limpiar el feedback
+            
+            /* ================================== */
+            /* ¡ESTA ES LA LÍNEA QUE LO ARREGLA! */
+            /* ================================== */
+            return; // Detiene la función AQUÍ MISMO.
+            
+        } else {
+            // ¡Va bien! Limpia el feedback si había un error
+            clearFeedback();
+        }
+
+        // Comprobar si completó la secuencia
+        if (userSequence.length === targetSequence.length) {
+            if (JSON.stringify(targetSequence) === JSON.stringify(userSequence)) {
+                // ¡Éxito!
+                handleSuccess();
+            } else {
+                // Falló en el último intento
+                showFeedback('¡ERROR DE CÓDIGO!', 'error');
+                resetGame(false);
+            }
+        }
+        
+        // Actualizar la UI de la secuencia (para mostrar el progreso)
+        updateSequenceDisplay();
+    }
+    
+    // Función de Éxito
+    function handleSuccess() {
+        showFeedback('¡ACCESO CONCEDIDO!', 'success');
+        
+        // Redirige al usuario al repo de GitHub tras 1 segundo
+        setTimeout(() => {
+            window.open(targetUrl, '_blank'); // Abre en nueva pestaña
+            hideModal();
+        }, 1000);
+    }
+
+    // Resetea el array del usuario
+    function resetGame(clearFeedbackText = true) {
+        userSequence = [];
+        if (clearFeedbackText) {
+            clearFeedback();
+        }
+        // Resetea la UI de la secuencia
+        updateSequenceDisplay();
+    }
+
+    // Muestra un mensaje (ej: error o éxito)
+    function showFeedback(message: string, type: 'error' | 'success') {
+        feedback.textContent = message;
+        feedback.className = `mb-4 h-6 text-center text-xl font-bold ${type === 'error' ? 'text-red-500' : 'text-lime-400'}`;
+    }
+    
+    // Limpia el mensaje
+    function clearFeedback() {
+        feedback.textContent = '';
+    }
+
+    // -------------
+    // 3. Lógica de UI (Las flechitas)
+    // -------------
+
+    // Dibuja las flechas de la secuencia OBJETIVO
+    function drawSequenceDisplay() {
+        sequenceDisplay.innerHTML = ''; // Limpia el display
+        
+        const keyToIcon: { [key: string]: string } = {
+            'ArrowUp': '↑',
+            'ArrowDown': '↓',
+            'ArrowLeft': '←',
+            'ArrowRight': '→'
+        };
+
+        targetSequence.forEach((key, index) => {
+            const icon = keyToIcon[key];
+            const span = document.createElement('span');
+            span.id = `seq-icon-${index}`;
+            span.textContent = icon;
+            span.className = 'text-4xl font-bold text-gray-600'; // Gris (pendiente)
+            sequenceDisplay.appendChild(span);
+        });
+    }
+
+    // Actualiza la UI para mostrar el PROGRESO del usuario
+    function updateSequenceDisplay() {
+        targetSequence.forEach((key, index) => {
+            const span = document.getElementById(`seq-icon-${index}`);
+            if (!span) return;
+
+            if (index < userSequence.length) {
+                // Esta tecla ya fue ingresada (y es correcta)
+                span.className = 'text-4xl font-bold text-lime-400'; // Verde (correcto)
+            } else {
+                // Tecla pendiente
+                span.className = 'text-4xl font-bold text-gray-600'; // Gris (pendiente)
+            }
+        });
+    }
+
+
+    // -------------
+    // 4. Event Listeners del Juego
+    // -------------
+
+    // Escucha el teclado (global)
+    window.addEventListener('keydown', (e) => {
+        // Si el modal no está visible, no hagas nada
+        if (modal.classList.contains('hidden')) {
+            return;
+        }
+        
+        // Previene que la página se scrollee con las flechas
+        e.preventDefault(); 
+        handleInput(e.key);
+    });
+
+    // Escucha los botones táctiles
+    touchButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const key = button.getAttribute('data-key');
+            if (key) {
+                handleInput(key);
+            }
+        });
+    });
+
+</script>

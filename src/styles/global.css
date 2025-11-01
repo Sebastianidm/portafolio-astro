@@ -1,3 +1,58 @@
+/* 1. Importación de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 @tailwind base;
 @tailwind components;
-@tailwind utilities
+@tailwind utilities;
+
+/* 3. Estilos base para el <body> (fondo y animación) */
+@layer base {
+  body {
+    
+    /* Fondo negro base */
+    background-color: #000;
+
+    /* Capas de imagen (Scanlines + Grid) */
+    background-image: 
+      /* Scanlines (negras, sutiles) */
+      linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.3) 50%,
+        transparent 50%
+      ),
+      /* Rejilla Vertical (Fucsia) */
+      linear-gradient(
+        to right,
+        rgba(192, 38, 211, 0.1) 1px,
+        transparent 1px
+      ),
+      /* Rejilla Horizontal (Fucsia) */
+      linear-gradient(
+        to bottom,
+        rgba(192, 38, 211, 0.1) 1px,
+        transparent 1px
+      );
+    
+    /* Tamaños de las capas */
+    background-size: 
+      100% 4px,   /* Scanlines */
+      35px 35px,  /* Grid V */
+      35px 35px;  /* Grid H */
+
+    /* Animación de las scanlines (lenta) */
+    animation: scanmove 120s linear infinite;
+  }
+}
+
+/* 4. Definición de la animación 'scanmove' */
+@keyframes scanmove {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    /* Mueve solo la primera capa (scanlines) */
+    background-position: 0 100vh, 0 0, 0 0;
+  }
+}
+
+
+
